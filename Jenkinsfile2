@@ -28,7 +28,7 @@ pipeline {
         }
       }
     }
-
+/*
     // Stage to deploy in the same OpenShift cluster
     stage('Apply files on OpenShift') {
       steps {
@@ -39,5 +39,6 @@ pipeline {
         }
       }
     }
+*/
   }
 }
