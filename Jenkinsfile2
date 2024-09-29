@@ -1,0 +1,43 @@
+pipeline {
+
+  environment {
+    dockerimagename = "ramann123/myimage"
+    dockerImage = ""
+    registryCredential = 'dockerhublogin'  // DockerHub credentials
+  }
+
+  agent any
+
+  stages {
+    stage('Build image') {
+      steps {
+        script {
+          // Build Docker image
+          dockerImage = docker.build dockerimagename
+        }
+      }
+    }
+
+    stage('Pushing Image') {
+      steps {
+        script {
+          // Push Docker image to DockerHub
+          docker.withRegistry('https://registry.hub.docker.com', registryCredential) {
+            dockerImage.push("latest")
+          }
+        }
+      }
+    }
+
+    // Stage to deploy in the same OpenShift cluster
+    stage('Apply files on OpenShift') {
+      steps {
+        script {
+          // Using 'oc' to delete pods and apply new configurations on the OpenShift cluster
+          sh 'oc delete pods --all'          // Clean up all pods (optional)
+          sh 'oc apply -f deploymentservice.yml'  // Apply Kubernetes/OpenShift YAML
+        }
+      }
+    }
+  }
+}
