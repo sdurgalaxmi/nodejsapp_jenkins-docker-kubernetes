@@ -46,6 +46,6 @@ spec:
     kind: Service
     name: nodeapp-service  # Name of the service to expose
   port:
-    targetPort: 5000  # Port to expose on the route
+    targetPort: 3000  # Port to expose on the route
   tls:
     termination: edge  # Optional: configure TLS termination
