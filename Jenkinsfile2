@@ -8,6 +8,15 @@ pipeline {
     agent any
 
     stages {
+       stage('install podman') {
+         steps {
+           script {
+               sh '''
+               apt-get update -y && apt install podman -y
+               '''
+                  }
+                } 
+              }
         stage('Install OpenShift CLI') {
             steps {
                 script {
