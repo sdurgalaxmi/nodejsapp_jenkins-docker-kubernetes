@@ -2,7 +2,8 @@ pipeline {
     environment {
         dockerimagename = "ramann123/myimage"
         registryCredential = 'dockerhublogin'  // Jenkins credential ID for DockerHub
-        REGISTRY_URL = 'docker.io' // DockerHub URL
+        ocCredential = 'openshift-creds' // Jenkins credential ID for OpenShift
+        namespace = 'raman' // OpenShift namespace
     }
 
     agent any
@@ -13,7 +14,7 @@ pipeline {
                 script {
                     withCredentials([usernamePassword(credentialsId: registryCredential, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                         sh '''
-                        podman login ${REGISTRY_URL} --username $USERNAME --password $PASSWORD
+                        podman login docker.io --username $USERNAME --password $PASSWORD
                         '''
                     }
                 }
@@ -30,12 +31,28 @@ pipeline {
             }
         }
 
-        stage('Pushing Image') {
+        stage('Push Image') {
             steps {
                 script {
                     sh '''
-                    podman push ${dockerimagename} ${REGISTRY_URL}/${dockerimagename}:latest
+                    podman push ${dockerimagename} docker.io/${dockerimagename}:latest
                     '''
+                }
+            }
+        }
+
+        stage('Deploy to OpenShift') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: ocCredential, usernameVariable: 'OC_USERNAME', passwordVariable: 'OC_PASSWORD')]) {
+                        sh '''
+                        oc login --username=$OC_USERNAME --password=$OC_PASSWORD --insecure-skip-tls-verify=true
+                        oc login --token=sha256~UKkDVbXERQCWfJvAWftbfLBZ5PDdr6jZeMI_oB4l7lE --server=https://api.natwest.priartw.com:6443
+                        oc project ${namespace}
+                        oc create deployment myappraman --image=${dockerimagename}:latest --dry-run=client -o yaml | oc apply -f -
+                        oc rollout status deployment/myappraman
+                        '''
+                    }
                 }
             }
         }
