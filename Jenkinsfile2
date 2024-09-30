@@ -3,7 +3,7 @@ pipeline {
         dockerimagename = "ramann123/myimage"
         registryCredential = 'dockerhublogin'  // Jenkins credential ID for DockerHub
         namespace = 'raman' // OpenShift namespace
-        yamlFile = 'openshiftdeployment.yaml' // Path to your YAML file
+        yamlFile = 'openshiftdeploymentfile.yaml' // Path to your YAML file
     }
 
     agent any
