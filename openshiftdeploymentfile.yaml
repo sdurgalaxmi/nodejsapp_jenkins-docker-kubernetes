@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nodeapp-deployment
+  labels:
+    app: nodeapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nodeapp
+  template:
+    metadata:
+      labels:
+        app: nodeapp 
+    spec:
+      containers:
+      - name: nodeserver
+        image: ramann123/myimage:latest
+        ports:
+        - containerPort: 3000
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: nodeapp-service
+spec:
+  selector:
+    app: nodeapp 
+  type: ClusterIP  # Change NodePort to ClusterIP
+  ports:
+  - protocol: TCP
+    port: 5000  # Port to expose for the service
+    targetPort: 3000  # Port on the container to forward to
+
+---
+
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: nodeapp-route
+spec:
+  to:
+    kind: Service
+    name: nodeapp-service  # Name of the service to expose
+  port:
+    targetPort: 5000  # Port to expose on the route
+  tls:
+    termination: edge  # Optional: configure TLS termination
