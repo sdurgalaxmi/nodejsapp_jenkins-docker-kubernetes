@@ -8,6 +8,20 @@ pipeline {
     agent any
 
     stages {
+        stage('Install OpenShift CLI') {
+            steps {
+                script {
+                    sh '''
+                    curl -LO https://github.com/openshift/okd/releases/latest/download/oc-linux-$(uname -s)-$(uname -m).tar.gz
+                    tar -xvf oc-linux-*.tar.gz
+                    mv oc /usr/local/bin/
+                    chmod +x /usr/local/bin/oc
+                    oc version  # Verify installation
+                    '''
+                }
+            }
+        }
+
         stage('Login to Docker Hub') {
             steps {
                 script {
