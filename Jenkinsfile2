@@ -13,6 +13,7 @@ pipeline {
                 script {
                     // Download and install the OpenShift CLI
                     sh '''
+                    apt-get update && apt-get install -y wget
                     wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable/openshift-client-linux.tar.gz
                     tar -xvf openshift-client-linux.tar.gz
                     mv oc /usr/local/bin/
