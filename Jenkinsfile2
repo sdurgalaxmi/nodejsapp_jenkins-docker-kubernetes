@@ -1,17 +1,28 @@
 pipeline {
     environment {
-        dockerimagename = "ramann123/myimage" // Podman image name
-        registryCredential = 'dockerhublogin'  // DockerHub credentials
-        REGISTRY_URL = 'registry.hub.docker.com' // DockerHub URL
+        dockerimagename = "ramann123/myimage"
+        registryCredential = 'dockerhublogin'  // Jenkins credential ID for DockerHub
+        REGISTRY_URL = 'docker.io' // DockerHub URL
     }
 
     agent any
 
     stages {
+        stage('Login to Docker Hub') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: registryCredential, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                        sh '''
+                        podman login ${REGISTRY_URL} --username $USERNAME --password $PASSWORD
+                        '''
+                    }
+                }
+            }
+        }
+
         stage('Build Image') {
             steps {
                 script {
-                    // Build Podman image
                     sh '''
                     podman build -t ${dockerimagename} -f ./dockerfile .
                     '''
@@ -22,30 +33,11 @@ pipeline {
         stage('Pushing Image') {
             steps {
                 script {
-                    // Log in to DockerHub
                     sh '''
-                    podman login ${REGISTRY_URL} --username ${registryCredential.username} --password ${registryCredential.password}
-                    '''
-
-                    // Push Podman image to DockerHub
-                    sh '''
-                    podman push ${dockerimagename}:latest
+                    podman push ${dockerimagename} ${REGISTRY_URL}/${dockerimagename}:latest
                     '''
                 }
             }
         }
-        
-        /*
-        // Stage to deploy in the same OpenShift cluster
-        stage('Apply files on OpenShift') {
-            steps {
-                script {
-                    // Using 'oc' to delete pods and apply new configurations on the OpenShift cluster
-                    sh 'oc delete pods --all'          // Clean up all pods (optional)
-                    sh 'oc apply -f deploymentservice.yml'  // Apply Kubernetes/OpenShift YAML
-                }
-            }
-        }
-        */
     }
 }
