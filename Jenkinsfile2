@@ -1,44 +1,51 @@
 pipeline {
-
-  environment {
-    dockerimagename = "ramann123/myimage"
-    dockerImage = ""
-    registryCredential = 'dockerhublogin'  // DockerHub credentials
-  }
-
-  agent any
-
-  stages {
-    stage('Build image') {
-      steps {
-        script {
-          // Build Docker image
-          dockerImage = docker.build dockerimagename
-        }
-      }
+    environment {
+        dockerimagename = "ramann123/myimage" // Podman image name
+        registryCredential = 'dockerhublogin'  // DockerHub credentials
+        REGISTRY_URL = 'registry.hub.docker.com' // DockerHub URL
     }
 
-    stage('Pushing Image') {
-      steps {
-        script {
-          // Push Docker image to DockerHub
-          docker.withRegistry('https://registry.hub.docker.com', registryCredential) {
-            dockerImage.push("latest")
-          }
+    agent any
+
+    stages {
+        stage('Build Image') {
+            steps {
+                script {
+                    // Build Podman image
+                    sh '''
+                    podman build -t ${dockerimagename} .
+                    '''
+                }
+            }
         }
-      }
-    }
-/*
-    // Stage to deploy in the same OpenShift cluster
-    stage('Apply files on OpenShift') {
-      steps {
-        script {
-          // Using 'oc' to delete pods and apply new configurations on the OpenShift cluster
-          sh 'oc delete pods --all'          // Clean up all pods (optional)
-          sh 'oc apply -f deploymentservice.yml'  // Apply Kubernetes/OpenShift YAML
+
+        stage('Pushing Image') {
+            steps {
+                script {
+                    // Log in to DockerHub
+                    sh '''
+                    podman login ${REGISTRY_URL} --username ${registryCredential.username} --password ${registryCredential.password}
+                    '''
+
+                    // Push Podman image to DockerHub
+                    sh '''
+                    podman push ${dockerimagename}:latest
+                    '''
+                }
+            }
         }
-      }
+        
+        /*
+        // Stage to deploy in the same OpenShift cluster
+        stage('Apply files on OpenShift') {
+            steps {
+                script {
+                    // Using 'oc' to delete pods and apply new configurations on the OpenShift cluster
+                    sh 'oc delete pods --all'          // Clean up all pods (optional)
+                    sh 'oc apply -f deploymentservice.yml'  // Apply Kubernetes/OpenShift YAML
+                }
+            }
+        }
+        */
     }
-*/
-  }
 }
