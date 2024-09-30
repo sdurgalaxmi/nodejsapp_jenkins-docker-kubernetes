@@ -2,7 +2,6 @@ pipeline {
     environment {
         dockerimagename = "ramann123/myimage"
         registryCredential = 'dockerhublogin'  // Jenkins credential ID for DockerHub
-        ocCredential = 'openshift-creds' // Jenkins credential ID for OpenShift
         namespace = 'raman' // OpenShift namespace
     }
 
