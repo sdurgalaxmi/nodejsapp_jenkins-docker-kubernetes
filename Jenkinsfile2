@@ -13,7 +13,7 @@ pipeline {
                 script {
                     // Build Podman image
                     sh '''
-                    podman build -t ${dockerimagename} .
+                    podman build -t ${dockerimagename} -f ./dockerfile .
                     '''
                 }
             }
