@@ -43,14 +43,12 @@ pipeline {
         stage('Deploy to OpenShift') {
             steps {
                 script {
-                    withCredentials([usernamePassword(credentialsId: ocCredential, usernameVariable: 'OC_USERNAME', passwordVariable: 'OC_PASSWORD')]) {
-                        sh '''
-                        oc login --token=sha256~UKkDVbXERQCWfJvAWftbfLBZ5PDdr6jZeMI_oB4l7lE --server=https://api.natwest.priartw.com:6443
-                        oc project ${namespace}
-                        oc create deployment myappraman --image=${dockerimagename}:latest --dry-run=client -o yaml | oc apply -f -
-                        oc rollout status deployment/myappraman
-                        '''
-                    }
+                    sh '''
+                    oc login --token=sha256~UKkDVbXERQCWfJvAWftbfLBZ5PDdr6jZeMI_oB4l7lE --server=https://api.natwest.priartw.com:6443
+                    oc project ${namespace}
+                    oc create deployment myappraman --image=${dockerimagename}:latest --dry-run=client -o yaml | oc apply -f -
+                    oc rollout status deployment/myappraman
+                    '''
                 }
             }
         }
