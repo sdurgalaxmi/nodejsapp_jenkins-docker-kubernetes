@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: nodeserver
-        image: ramann123/myimage:latest
+        image: sdurgalaxmi/durga_cicd:latest
         ports:
         - containerPort: 3000
 
