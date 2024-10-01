@@ -70,7 +70,7 @@ pipeline {
             steps {
                 script {
                     sh '''
-                    oc login --token=sha256~UKkDVbXERQCWfJvAWftbfLBZ5PDdr6jZeMI_oB4l7lE --server=https://api.natwest.priartw.com:6443 --insecure-skip-tls-verify
+                    oc login --token=sha256~2_xG7pOo96IvPrh_qaFC2bTzQMn5MvZKaAhRAqMrDTA --server=https://api.natwest.priartw.com:6443 --insecure-skip-tls-verify
                     oc project ${namespace}
                     oc apply -f ${yamlFile}  # Apply the YAML file directly
                     oc rollout status deployment/myappraman
