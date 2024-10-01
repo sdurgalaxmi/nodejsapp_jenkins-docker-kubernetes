@@ -73,7 +73,7 @@ pipeline {
                     oc login --token=sha256~2_xG7pOo96IvPrh_qaFC2bTzQMn5MvZKaAhRAqMrDTA --server=https://api.natwest.priartw.com:6443 --insecure-skip-tls-verify
                     oc project ${namespace}
                     oc apply -f ${yamlFile}  # Apply the YAML file directly
-                    oc rollout status deployment/myappraman
+                    oc rollout status deployment/nodeapp-deployment
                     '''
                 }
             }
